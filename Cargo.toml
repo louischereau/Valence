@@ -15,3 +15,10 @@ pyo3 = { version = "0.20.0", features = ["extension-module"] }
 # High-performance math
 ndarray = "0.15.6"
 nalgebra = "0.32.0" # This is the gold standard for robotics/physics geometry
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "physics_bench"
+harness = false
