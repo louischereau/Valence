@@ -1,1 +1,10 @@
+.venv/
 /target
+__pycache__/
+*.so
+*.pyd
+*.dylib
+.install_stamp
+dist/
+.ruff_cache/
+.pytest_cache/

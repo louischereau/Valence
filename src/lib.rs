@@ -1,5 +1,5 @@
-use pyo3::prelude::*;
 use nalgebra::{Point3, Vector3};
+use pyo3::prelude::*;
 
 #[pyclass]
 pub struct MolecularGraph {
@@ -12,11 +12,15 @@ pub struct MolecularGraph {
 impl MolecularGraph {
     #[new]
     fn new(atomic_numbers: Vec<i64>, coords: Vec<(f64, f64, f64)>) -> Self {
-        let positions = coords.into_iter()
+        let positions = coords
+            .into_iter()
             .map(|(x, y, z)| Point3::new(x, y, z))
             .collect();
-        
-        MolecularGraph { atomic_numbers, positions }
+
+        MolecularGraph {
+            atomic_numbers,
+            positions,
+        }
     }
 
     /// Finds all neighbors within a cutoff distance (e.g., 1.6 Angstroms)
