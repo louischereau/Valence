@@ -1,0 +1,70 @@
+name: Valence Core CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. Setup Rust Toolchain
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      # 2. Setup uv (The modern way)
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true      # Automatically caches your Python dependencies
+          version: "latest"
+
+      # 3. Rust Quality Checks
+      - name: Rust Format & Lint
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy -- -D warnings
+
+      # 4. Python Quality Checks (Using uv run)
+      - name: Python Linting & Format Check
+        run: |
+          uv run ruff check python/
+          uv run ruff format --check python/
+
+      # 5. Build and Test
+      - name: Build & Run Tests
+        run: |
+          uv run maturin develop  # Compiles Rust and installs into the uv environment
+          cargo test --locked
+          uv run pytest tests/
+
+  benchmarking:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: check-and-test
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      
+      - name: Run Benchmarks
+        run: |
+          uv run maturin develop
+          cargo bench --locked -- --output-format bencher | tee output.txt
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'cargo'
+          output-file-path: output.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true

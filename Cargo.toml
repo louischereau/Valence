@@ -1,0 +1,17 @@
+[package]
+name = "valence"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"  # <--- Add this line
+
+[lib]
+# This name must match the name in your #[pymodule] in lib.rs
+name = "valence" 
+crate-type = ["cdylib"]
+
+[dependencies]
+# The bridge between Rust and Python
+pyo3 = { version = "0.20.0", features = ["extension-module"] }
+# High-performance math
+ndarray = "0.15.6"
+nalgebra = "0.32.0" # This is the gold standard for robotics/physics geometry
