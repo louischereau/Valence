@@ -17,6 +17,7 @@ dev = [
     "pytest",
     "maturin",
     "ruff",
+    "pre-commit",
 ]
 
 [build-system]

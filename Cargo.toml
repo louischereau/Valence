@@ -6,7 +6,7 @@ license = "MIT OR Apache-2.0"  # <--- Add this line
 
 [lib]
 # This name must match the name in your #[pymodule] in lib.rs
-name = "valence" 
+name = "valence"
 crate-type = ["cdylib"]
 
 [dependencies]
