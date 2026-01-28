@@ -1,3 +1,4 @@
+#![allow(non_local_definitions)]
 use nalgebra::Point3;
 use pyo3::prelude::*;
 
@@ -8,6 +9,7 @@ pub struct MolecularGraph {
     pub positions: Vec<Point3<f64>>,
 }
 
+#[allow(non_local_definitions)]
 #[pymethods]
 impl MolecularGraph {
     #[new]
@@ -42,7 +44,7 @@ impl MolecularGraph {
 }
 
 #[pymodule]
-fn valence(_py: Python, m: &PyModule) -> PyResult<()> {
+fn _lowlevel(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<MolecularGraph>()?;
     Ok(())
 }
