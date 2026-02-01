@@ -50,8 +50,32 @@ test: $(INSTALL_STAMP)
 release: $(INSTALL_STAMP)
 	$(UV) run maturin build --release --out dist/
 
+
 bench:
-	$(CARGO) bench
+	$(CARGO) bench --bench molecular_bench
+
+# Generate the X-ray of performance
+profile:
+	CARGO_PROFILE_RELEASE_DEBUG=true sudo $(CARGO) flamegraph --bench molecular_bench
+
+# Build with the ultimate machine-specific optimizations (SIMD)
+build-native:
+	RUSTFLAGS="-C target-cpu=native" $(CARGO) build --release
+
+# Audit the generated assembly to verify SIMD (AVX/SSE) instructions
+# Audit the Fused Kernel (The method name changed to run_fused_with_model)
+audit-asm:
+	@echo "Searching for SIMD vectors in the fused kernel..."
+	RUSTFLAGS="-C target-cpu=native" $(CARGO) asm valence::graph::MolecularGraph::run_fused_with_model | grep -E "vaddps|vmulps|ymm|zmm" || echo "No SIMD detected."
+
+sample:
+	@samply record $(shell ls target/release/deps/molecular_bench-*) --bench
+
+tracy:
+	RUSTFLAGS="-C target-cpu=native" $(CARGO) run --features tracy --example profile_engine
+
+# Run everything
+optimize: build-native bench profile
 
 clean:
 	$(CARGO) clean

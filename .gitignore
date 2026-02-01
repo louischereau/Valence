@@ -5,6 +5,7 @@ __pycache__/
 *.pyd
 *.dylib
 *.pyc
+*.npy
 .install_stamp
 dist/
 .ruff_cache/
