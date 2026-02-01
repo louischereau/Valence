@@ -77,6 +77,11 @@ tracy:
 # Run everything
 optimize: build-native bench profile
 
+# Run a high-load Python simulation to test batching and Pydantic overhead
+stress-test: dev
+	@echo "--- Running Python Stress Test (High Throughput) ---"
+	$(UV) run python scripts/stress_test.py
+
 clean:
 	$(CARGO) clean
 	rm -rf $(VENV) dist/
