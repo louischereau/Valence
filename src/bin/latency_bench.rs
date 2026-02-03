@@ -3,19 +3,27 @@ use plotters::prelude::*;
 use std::time::{Duration, Instant};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    use std::env;
+    let args: Vec<String> = env::args().collect();
+    let json_mode = args.iter().any(|a| a == "--json");
+
     // 1. Setup Histogram: 3 sig figs, tracking nanos up to 1 second
     let mut hist = Histogram::<u64>::new_with_max(1_000_000_000, 3)?;
     let mut timeline: Vec<(u64, u64)> = Vec::new();
 
     // 2. Warm-up
-    println!("Warming up...");
+    if !json_mode {
+        println!("Warming up...");
+    }
     for _ in 0..1000 {
         let start = Instant::now();
         let _ = start.elapsed();
     }
 
     // 3. Benchmarking Loop
-    println!("Benchmarking 10,000 iterations...");
+    if !json_mode {
+        println!("Benchmarking 10,000 iterations...");
+    }
     for i in 0..10_000 {
         let start = Instant::now();
         // --- TARGET CODE ---
@@ -31,6 +39,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let p50 = hist.value_at_quantile(0.50);
     let p95 = hist.value_at_quantile(0.95);
     let p99 = hist.value_at_quantile(0.99);
+
+    if json_mode {
+        // Output only JSON summary
+        println!("{{\"p50\":{},\"p95\":{},\"p99\":{}}}", p50, p95, p99);
+        return Ok(());
+    }
 
     let root = BitMapBackend::new("latency_report.png", (1024, 1000)).into_drawing_area();
     root.fill(&WHITE)?;
