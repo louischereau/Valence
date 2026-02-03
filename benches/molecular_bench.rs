@@ -1,8 +1,6 @@
 #[cfg(feature = "codspeed")]
 use codspeed_criterion_compat as criterion;
 #[cfg(not(feature = "codspeed"))]
-use criterion;
-
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use nalgebra::{DMatrix, Vector3};
 use numpy::ndarray;

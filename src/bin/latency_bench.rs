@@ -21,9 +21,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // --- TARGET CODE ---
         std::thread::sleep(Duration::from_nanos(100));
         // -------------------
-        let latency = start.elapsed().as_nanos() as u64;
+        let nanos = start.elapsed().as_nanos();
+        let latency = u64::try_from(nanos).unwrap_or(u64::MAX); // handle possible truncation
         hist.record(latency)?;
-        timeline.push((i as u64, latency));
+        #[allow(clippy::cast_sign_loss)]
+        timeline.push((i as u64, latency)); // i is always positive, safe to cast
     }
 
     let p50 = hist.value_at_quantile(0.50);
@@ -59,10 +61,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .x_label_area_size(40)
         .y_label_area_size(80)
         // This .log_scale() is what you're looking for!
-        .build_cartesian_2d(
-            (100u64..hist.max()).log_scale(),
-            0u64..(hist.len() / 5) as u64,
-        )?;
+        .build_cartesian_2d((100u64..hist.max()).log_scale(), 0..(hist.len() / 5))?;
 
     hist_chart
         .configure_mesh()
@@ -72,7 +71,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Using iter_log for a better distribution visual on log-axes
     hist_chart.draw_series(hist.iter_log(100, 1.1).map(|v| {
         let x0 = v.value_iterated_to();
-        let x1 = x0 + (x0 as f64 * 0.1) as u64; // Slight width for visibility
+        // Avoid casting u64 to f64 and back; use integer math for width
+        let width = (x0 / 10).max(1); // 10% width, at least 1
+        let x1 = x0.saturating_add(width); // Prevent overflow
         let y = v.count_since_last_iteration();
         Rectangle::new([(x0, 0), (x1, y)], BLUE.mix(0.4).filled())
     }))?;
@@ -87,7 +88,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         jitter_chart
             .draw_series(std::iter::once(PathElement::new(
                 vec![(0, val), (10_000, val)],
-                color.stroke_width(2).dashed(),
+                color.stroke_width(2),
             )))?
             .label(label)
             .legend(move |(x, y)| {
@@ -102,8 +103,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     jitter_chart
         .configure_series_labels()
-        .background_style(&WHITE.mix(0.8))
-        .border_style(&BLACK)
+        .background_style(WHITE.mix(0.8))
+        .border_style(BLACK)
         .draw()?;
     root.present()?;
     Ok(())

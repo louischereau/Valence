@@ -5,18 +5,19 @@ use std::io::{BufRead, BufReader};
 #[derive(Debug)]
 struct PerfMetrics {
     gflops: f64,
+    #[allow(dead_code)]
     gb_per_sec: f64,
     ai: f64,
 }
 
 fn parse_likwid(path: &str) -> PerfMetrics {
-    let file = File::open(path).unwrap_or_else(|_| panic!("Could not find {}", path));
+    let file = File::open(path).unwrap_or_else(|_| panic!("Could not find {path}"));
     let reader = BufReader::new(file);
 
     let mut mflops = 0.0;
     let mut mbytes_s = 0.0;
 
-    for line in reader.lines().flatten() {
+    for line in reader.lines().map_while(Result::ok) {
         // LIKWID outputs tables; we look for the runtime summary lines
         if line.contains("DP [MFLOP/s]") {
             mflops = line
@@ -96,7 +97,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     chart
         .draw_series(LineSeries::new(
             vec![(0.01, 0.01 * l1_bw), (peak_vector / l1_bw, peak_vector)],
-            BLUE.stroke_width(1).dashed(),
+            BLUE.stroke_width(1),
         ))?
         .label("L1 Bandwidth Limit");
 
@@ -104,7 +105,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     chart
         .draw_series(LineSeries::new(
             vec![(0.01, peak_scalar), (100.0, peak_scalar)],
-            BLACK.stroke_width(1).dashed(),
+            BLACK.stroke_width(1),
         ))?
         .label("Peak Scalar Performance");
 
@@ -115,9 +116,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         GREEN.filled(),
     )))?;
 
-    chart
-        .configure_series_labels()
-        .border_style(&BLACK)
-        .draw()?;
+    chart.configure_series_labels().border_style(BLACK).draw()?;
     Ok(())
 }
