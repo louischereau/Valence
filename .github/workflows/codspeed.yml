@@ -1,0 +1,46 @@
+name: CodSpeed Benchmarks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  benchmarks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Setup Python
+        run: uv python install 3.13
+
+      - name: Install cargo-codspeed
+        uses: taiki-e/cache-cargo-install-action@v2
+        with:
+          tool: cargo-codspeed@4.3.0
+
+      - name: Build benchmarks
+        run: |
+          export PYO3_PYTHON=$(uv python find 3.13)
+          cargo codspeed build
+
+      - name: Run benchmarks
+        uses: CodSpeedHQ/action@v4.10.4
+        with:
+          mode: simulation
+          run: cargo codspeed run

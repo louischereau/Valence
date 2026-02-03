@@ -1,6 +1,8 @@
 
 # Valence
 
+[![CodSpeed](https://img.shields.io/badge/CodSpeed-Performance%20Tracking-blue?logo=github&style=flat-square)](https://codspeed.io/louischereau/Valence?utm_source=badge)
+
 **High-performance Geometric GNN Engine for Chemistry and Physics**
 
 ## Overview
@@ -15,7 +17,7 @@ Valence builds molecular graphs from atomic coordinates and atomic numbers, repr
  - **Edges**: Created using a distance-based cutoff, reflecting chemical bonding and physical interactions.
  - **RBF Expansion**:
 	 - Edge features are expanded using Radial Basis Functions (RBFs), a standard technique in molecular machine learning.
-	 - RBF expansion transforms raw interatomic distances into a smooth, differentiable feature space, improving the GNN’s ability to learn complex spatial relationships.
+	 - RBF expansion transforms raw interatomic distances into a smooth, differentiable feature space, improving the GNN's ability to learn complex spatial relationships.
 	 - This is critical for capturing both short-range (covalent) and long-range (non-covalent) interactions.
  - **Cutoff Choice**: The cutoff parameter (e.g., 1.2 Å for methane, 5.0 Å for large systems) is chosen to balance physical realism and computational efficiency. It captures both covalent bonds and relevant non-covalent interactions, ensuring the GNN sees all chemically meaningful neighbors without excessive noise.
 
@@ -41,7 +43,7 @@ Valence is engineered for high-throughput scientific workloads:
 	Building the molecular graph from atomic positions is $O(N^2)$ in the naive case (where $N$ is the number of atoms), as all pairwise distances are checked for edge creation. For small molecules, this is negligible; for large systems, optimizations (e.g., spatial partitioning) can be added.
 
 - **Parallelism with Rayon**:
-	Rust’s [Rayon](https://github.com/rayon-rs/rayon) library is used for data-parallelism in core modules (`batch.rs`, `graph.rs`).
+	Rust's [Rayon](https://github.com/rayon-rs/rayon) library is used for data-parallelism in core modules (`batch.rs`, `graph.rs`).
 	- **Why Rayon?**: Rayon provides ergonomic, zero-cost abstractions for parallel iteration, allowing us to scale across all CPU cores with minimal code changes.
 	- **Where?**:
 		- In `batch.rs`, batch inference over multiple graphs is parallelized.
