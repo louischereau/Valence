@@ -54,4 +54,4 @@ jobs:
         uses: CodSpeedHQ/action@v4.10.4
         with:
           mode: simulation
-          run: cargo codspeed run --features codspeed
+          run: cargo codspeed run
