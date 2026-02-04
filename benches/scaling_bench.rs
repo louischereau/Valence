@@ -1,7 +1,9 @@
 #[cfg(feature = "codspeed")]
-use codspeed_criterion_compat as criterion;
+use codspeed_criterion_compat::{
+    black_box, criterion_group, criterion_main, BenchmarkId, Criterion,
+};
 #[cfg(not(feature = "codspeed"))]
-use criterion::{black_box, BenchmarkId, Criterion};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 
 fn generate_data(size: usize) -> Vec<f32> {
     vec![1.0; size]

@@ -1,5 +1,7 @@
 #[cfg(feature = "codspeed")]
-use codspeed_criterion_compat as criterion;
+use codspeed_criterion_compat::{
+    black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput,
+};
 #[cfg(not(feature = "codspeed"))]
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use nalgebra::{DMatrix, Vector3};
