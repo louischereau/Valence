@@ -59,5 +59,11 @@ fn bench_fused_inference_scaling(c: &mut BenchCriterion) {
     group.finish();
 }
 
-criterion_group!(benches, bench_fused_inference_scaling);
-criterion_main!(benches);
+#[cfg(feature = "codspeed")]
+codspeed_criterion_compat::criterion_group!(benches, bench_fused_inference_scaling);
+#[cfg(feature = "codspeed")]
+codspeed_criterion_compat::criterion_main!(benches);
+#[cfg(not(feature = "codspeed"))]
+criterion::criterion_group!(benches, bench_fused_inference_scaling);
+#[cfg(not(feature = "codspeed"))]
+criterion::criterion_main!(benches);
