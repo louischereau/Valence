@@ -1,5 +1,3 @@
-<!-- # [![CodSpeed Benchmarks](https://app.codspeed.io/badge/louischereau/Valence.svg)](https://app.codspeed.io/projects/louischereau/Valence) -->
-
 # Valence
 
 [![CodSpeed](https://img.shields.io/badge/CodSpeed-Performance%20Tracking-blue?logo=github&style=flat-square)](https://codspeed.io/louischereau/Valence?utm_source=badge)
