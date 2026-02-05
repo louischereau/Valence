@@ -17,7 +17,6 @@ dependencies = [
 [tool.semantic_release]
 version_variable = [
   "pyproject.toml:version",
-  "Cargo.toml:package.version"
 ]
 tag_format = "v{version}"
 
