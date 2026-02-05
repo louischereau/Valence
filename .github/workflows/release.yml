@@ -28,7 +28,11 @@ jobs:
         uses: astral-sh/setup-uv@v3
 
 
-      # 4. Create virtual environment
+      # 4. Install system dependencies for Rust build
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev
+
+      # 5. Create virtual environment
       - name: Create virtual environment
         run: uv venv
 
