@@ -27,7 +27,12 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v3
 
-      # 4. Install required tools
+
+      # 4. Create virtual environment
+      - name: Create virtual environment
+        run: uv venv
+
+      # 5. Install required tools
       - name: Install tools
         run: |
           uv tool install maturin       # for building wheels
