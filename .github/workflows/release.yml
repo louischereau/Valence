@@ -46,8 +46,6 @@ jobs:
       - name: Semantic release (version bump + commit + tag)
         working-directory: ${{ github.workspace }}
         run: |
-          ls -l
-          cat pyproject.toml
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
