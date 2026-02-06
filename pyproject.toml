@@ -18,6 +18,7 @@ dependencies = [
 version_variable = [
   "pyproject.toml:version",
 ]
+branch = "main"
 tag_format = "v{version}"
 
 # Standard way to define dev tools
