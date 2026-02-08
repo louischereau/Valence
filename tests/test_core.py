@@ -8,13 +8,13 @@ import hadronis
 @pytest.fixture(scope="session", autouse=True)
 def create_mock_safetensors():
     try:
-        from safetensors.numpy import save
+        from safetensors.numpy import save_file
     except ImportError:
         pytest.skip("safetensors package not installed")
     path = "tests/mock_weights.safetensors"
     if not os.path.exists(path):
         weights = np.eye(8, dtype=np.float32)
-        save({"weights": weights}, path)
+        save_file({"weights": weights}, path)
 
 
 @pytest.fixture
@@ -48,7 +48,7 @@ def test_batch_inference_single_molecule(methane_data):
     mol_ptrs = np.array([0, len(atomic_numbers)], dtype=np.int32)
     features = np.ones((len(atomic_numbers), 16), dtype=np.float32)
     engine = hadronis.HadronisEngine("tests/mock_weights.safetensors")
-    output = engine.run_batch_inference(
+    output = engine.predict_batch(
         atomic_numbers,
         positions,
         mol_ptrs,
@@ -66,7 +66,7 @@ def test_batch_inference_two_atoms():
     mol_ptrs = np.array([0, 2], dtype=np.int32)
     features = np.ones((2, 8), dtype=np.float32)
     engine = hadronis.HadronisEngine("tests/mock_weights.safetensors")
-    output = engine.run_batch_inference(
+    output = engine.predict_batch(
         atomic_numbers,
         positions,
         mol_ptrs,
@@ -85,7 +85,7 @@ def test_batch_inference_multiple_molecules():
     mol_ptrs = np.array([0, 2, 4], dtype=np.int32)
     features = np.ones((4, 8), dtype=np.float32)
     engine = hadronis.HadronisEngine("tests/mock_weights.safetensors")
-    output = engine.run_batch_inference(
+    output = engine.predict_batch(
         atomic_numbers,
         positions,
         mol_ptrs,
@@ -107,7 +107,7 @@ def test_batch_inference_consistency():
     mol_ptrs = np.array([0, 2, 4], dtype=np.int32)
     features = np.ones((4, 8), dtype=np.float32)
     engine = hadronis.HadronisEngine("tests/mock_weights.safetensors")
-    output = engine.run_batch_inference(
+    output = engine.predict_batch(
         atomic_numbers,
         positions,
         mol_ptrs,

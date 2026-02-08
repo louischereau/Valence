@@ -7,8 +7,8 @@ import numpy as np
 import psutil
 
 from memory_tracker import track_memory
-from python import hadronis
-from safetensors.numpy import save
+import hadronis
+from safetensors.numpy import save_file
 
 
 def get_memory_mb():
@@ -20,7 +20,7 @@ def get_memory_mb():
 def run_engine(
     engine: hadronis.HadronisEngine, atomic_numbers, positions, mol_ptrs, features
 ):
-    return engine.run_batch_inference(
+    return engine.predict_batch(
         atomic_numbers,
         positions,
         mol_ptrs,
@@ -39,7 +39,7 @@ def run_stress_test():
     # Save random weights to a temporary safetensors file
     weights = np.random.rand(64, 64).astype(np.float32)
     weights_path = "./tmp_stress_weights.safetensors"
-    save({"weights": weights}, weights_path)
+    save_file({"weights": weights}, weights_path)
     engine = hadronis.HadronisEngine(weights_path)
 
     # 2. Generate a large batch of molecules

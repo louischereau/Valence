@@ -1,4 +1,4 @@
-use hadronis::batch::build_batched_neighbors;
+use hadronis::engine::build_batched_neighbors;
 use hadronis::model::GNNModel;
 use nalgebra::DMatrix;
 use numpy::ndarray;
@@ -28,7 +28,8 @@ fn main() {
     let mol_ptrs = vec![0, n_atoms as i32];
     // Build batched neighbor list
     let (edge_src, edge_dst, edge_relpos) =
-        build_batched_neighbors(&positions_batch.view(), &mol_ptrs, cutoff, k);
+        build_batched_neighbors(&positions_batch.view(), &mol_ptrs, cutoff, k)
+            .expect("Failed to build neighbors: positions must be C-contiguous [N,3]");
 
     println!("Engine initialized. Running 50 iterations for profiling...");
     let start = Instant::now();
