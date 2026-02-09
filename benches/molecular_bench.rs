@@ -29,6 +29,7 @@ fn setup_batch_data(
 fn bench_batch_inference_scaling(c: &mut BenchCriterion) {
     let mut group = c.benchmark_group("Hadronis_Batch_Performance");
     let feat_dim = 64;
+    let num_rbf = 64;
     for n in &[100, 500, 1000] {
         let (atomic_numbers, positions, mol_ptrs, features, model) = setup_batch_data(*n, feat_dim);
         let (edge_src, edge_dst, edge_relpos) =
@@ -46,7 +47,7 @@ fn bench_batch_inference_scaling(c: &mut BenchCriterion) {
                     &edge_relpos,
                     mol_ptrs.as_slice().unwrap(),
                     5.0,
-                    16,
+                    num_rbf,
                 );
                 black_box(result)
             });

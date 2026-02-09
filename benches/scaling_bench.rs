@@ -30,6 +30,7 @@ fn generate_batch_data(
 fn bench_scaling(c: &mut BenchCriterion) {
     let mut group = c.benchmark_group("Inference Scaling");
     let feat_dim = 64;
+    let num_rbf = 64;
     for &size in &[128, 256, 512, 1024] {
         let (atomic_numbers, positions, mol_ptrs, features, model) =
             generate_batch_data(size, feat_dim);
@@ -47,7 +48,7 @@ fn bench_scaling(c: &mut BenchCriterion) {
                     &edge_relpos,
                     mol_ptrs.as_slice().unwrap(),
                     5.0,
-                    16,
+                    num_rbf,
                 );
                 black_box(result)
             });

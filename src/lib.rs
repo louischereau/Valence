@@ -5,10 +5,10 @@ pub mod core;
 pub mod engine;
 
 // Bring the structs into scope
-use crate::engine::HarmonisEngine;
+use crate::engine::HadronisEngine;
 
 #[pymodule]
 fn _lowlevel(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<HarmonisEngine>()?;
+    m.add_class::<HadronisEngine>()?;
     Ok(())
 }

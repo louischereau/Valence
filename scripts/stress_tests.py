@@ -23,10 +23,11 @@ def run_engine(
     return engine.predict_batch(
         atomic_numbers,
         positions,
-        mol_ptrs,
         features,
+        mol_ptrs,
         cutoff=1.2,
         k=8,
+        num_rbf=64,
     )
 
 

@@ -46,17 +46,18 @@ def test_batch_inference_single_molecule(methane_data):
     atomic_numbers = np.array(methane_data["atomic_numbers"], dtype=np.int32)
     positions = np.array(methane_data["positions"], dtype=np.float32)
     mol_ptrs = np.array([0, len(atomic_numbers)], dtype=np.int32)
-    features = np.ones((len(atomic_numbers), 16), dtype=np.float32)
+    features = np.ones((len(atomic_numbers), 8), dtype=np.float32)
     engine = hadronis.HadronisEngine("tests/mock_weights.safetensors")
     output = engine.predict_batch(
         atomic_numbers,
         positions,
-        mol_ptrs,
         features,
+        mol_ptrs,
         cutoff=1.2,
         k=8,
+        num_rbf=8,
     )
-    assert output.shape == (len(atomic_numbers), 16)
+    assert output.shape == (len(atomic_numbers), 8)
     assert isinstance(output, np.ndarray)
 
 
@@ -69,10 +70,11 @@ def test_batch_inference_two_atoms():
     output = engine.predict_batch(
         atomic_numbers,
         positions,
-        mol_ptrs,
         features,
+        mol_ptrs,
         cutoff=1.5,
         k=4,
+        num_rbf=8,
     )
     assert np.all(output > 0)
     assert output.shape == (2, 8)
@@ -88,10 +90,11 @@ def test_batch_inference_multiple_molecules():
     output = engine.predict_batch(
         atomic_numbers,
         positions,
-        mol_ptrs,
         features,
+        mol_ptrs,
         cutoff=1.5,
         k=4,
+        num_rbf=8,
     )
     assert output.shape == (4, 8)
     # First molecule should have non-zero results (within cutoff)
@@ -110,13 +113,26 @@ def test_batch_inference_consistency():
     output = engine.predict_batch(
         atomic_numbers,
         positions,
-        mol_ptrs,
         features,
+        mol_ptrs,
         cutoff=1.5,
         k=4,
+        num_rbf=8,
     )
     assert output.shape == (4, 8)
     # First molecule should have non-zero results (within cutoff)
     assert np.sum(output[:2]) > 0
     # Second molecule should have zero results (2.0 > 1.5 cutoff)
     assert np.sum(output[2:]) == 0
+
+
+# Additional test for neighbor list construction
+def test_build_batched_neighbors(methane_data):
+    positions = np.array(methane_data["positions"], dtype=np.float32)
+    mol_ptrs = np.array([0, len(methane_data["atomic_numbers"])], dtype=np.int32)
+    edge_src, edge_dst, edge_relpos = hadronis.HadronisEngine.build_batched_neighbors(
+        positions, mol_ptrs, cutoff=1.2, k=8
+    )
+    assert isinstance(edge_src, np.ndarray)
+    assert isinstance(edge_dst, np.ndarray)
+    assert isinstance(edge_relpos, np.ndarray)

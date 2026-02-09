@@ -12,7 +12,7 @@ type PyNeighborResult = PyResult<(Vec<usize>, Vec<usize>, Vec<[f32; 3]>)>;
 
 /// Python wrapper for GNNModel
 #[pyclass]
-pub struct HarmonisEngine {
+pub struct HadronisEngine {
     inner: GNNModel,
     // Keep mmap alive if loaded from file for zero-copy
     #[allow(dead_code)]
@@ -20,7 +20,7 @@ pub struct HarmonisEngine {
 }
 
 #[pymethods]
-impl HarmonisEngine {
+impl HadronisEngine {
     /// Load weights from safetensors file using mmap (zero-copy)
     #[staticmethod]
     pub fn from_file(path: &str) -> PyResult<Self> {
@@ -52,7 +52,7 @@ impl HarmonisEngine {
             bytemuck::cast_slice(tensor.data()),
         );
 
-        Ok(HarmonisEngine {
+        Ok(HadronisEngine {
             inner: GNNModel { weights },
             _mmap: Some(mmap), // keep mmap alive
         })

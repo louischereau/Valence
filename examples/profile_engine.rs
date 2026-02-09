@@ -1,5 +1,5 @@
-use hadronis::engine::build_batched_neighbors;
-use hadronis::model::GNNModel;
+use hadronis::core::connectivity::build_batched_neighbors;
+use hadronis::core::model::GNNModel;
 use nalgebra::DMatrix;
 use numpy::ndarray;
 use std::time::Instant;
@@ -12,6 +12,7 @@ fn main() {
     let feat_dim = 64;
     let k = 16;
     let cutoff = 5.0;
+    let num_rbf = 64;
 
     // Atomic numbers for each atom in batch
     let atomic_numbers_batch = ndarray::Array1::from_elem(n_atoms, 6);
@@ -27,9 +28,18 @@ fn main() {
     // Build mol_ptrs for single batch
     let mol_ptrs = vec![0, n_atoms as i32];
     // Build batched neighbor list
-    let (edge_src, edge_dst, edge_relpos) =
+    let (edge_src, edge_dst, edge_relpos_vec) =
         build_batched_neighbors(&positions_batch.view(), &mol_ptrs, cutoff, k)
             .expect("Failed to build neighbors: positions must be C-contiguous [N,3]");
+    // Convert Vec<[f32; 3]> to ndarray::Array2<f32>
+    let edge_relpos = ndarray::Array2::from_shape_vec(
+        (edge_relpos_vec.len(), 3),
+        edge_relpos_vec
+            .iter()
+            .flat_map(|arr| arr.iter().cloned())
+            .collect(),
+    )
+    .expect("Failed to convert edge_relpos to Array2");
 
     println!("Engine initialized. Running 50 iterations for profiling...");
     let start = Instant::now();
@@ -43,7 +53,7 @@ fn main() {
             &edge_relpos,
             &mol_ptrs,
             cutoff,
-            k,
+            num_rbf,
         );
         if i % 10 == 0 {
             println!("Iteration {i}...");
