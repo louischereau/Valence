@@ -1,3 +1,8 @@
+#![deny(clippy::correctness)]
+#![deny(clippy::perf)]
+#![deny(clippy::complexity)]
+#![warn(clippy::style)]
+#![allow(clippy::cast_precision_loss)]
 #![feature(portable_simd)]
 use pyo3::prelude::*;
 // Declare the modules

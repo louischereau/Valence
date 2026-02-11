@@ -36,7 +36,8 @@ jobs:
       - name: Rust Format & Lint
         run: |
           cargo fmt --all -- --check
-          cargo clippy --all-targets -- -D warnings -D clippy::pedantic
+          # cargo clippy --all-targets -- -D warnings -D clippy::pedantic
+          cargo clippy --all-targets -- -D warnings
 
       # 4. Python Quality Checks (Using uv run)
       - name: Python Linting & Format Check

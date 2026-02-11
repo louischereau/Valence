@@ -45,7 +45,7 @@ fn main() {
     let start = Instant::now();
     for i in 0..50 {
         let _result = model.run_batched(
-            &atomic_numbers_batch.as_slice().unwrap(),
+            atomic_numbers_batch.as_slice().unwrap(),
             &positions_batch.view(),
             &features_batch.view(),
             &edge_src,

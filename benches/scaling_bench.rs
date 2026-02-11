@@ -3,8 +3,8 @@ use codspeed_criterion_compat::{black_box, BenchmarkId, Criterion as BenchCriter
 #[cfg(not(feature = "codspeed"))]
 use criterion::{black_box, BenchmarkId, Criterion as BenchCriterion};
 
-use hadronis::engine::build_batched_neighbors;
-use hadronis::model::GNNModel;
+use hadronis::core::connectivity::build_batched_neighbors;
+use hadronis::core::model::GNNModel;
 use nalgebra::DMatrix;
 use numpy::ndarray;
 
@@ -34,9 +34,14 @@ fn bench_scaling(c: &mut BenchCriterion) {
     for &size in &[128, 256, 512, 1024] {
         let (atomic_numbers, positions, mol_ptrs, features, model) =
             generate_batch_data(size, feat_dim);
-        let (edge_src, edge_dst, edge_relpos) =
-            build_batched_neighbors(&positions.view(), &mol_ptrs.as_slice().unwrap(), 5.0, 16)
+        let (edge_src, edge_dst, edge_relpos_vec) =
+            build_batched_neighbors(&positions.view(), mol_ptrs.as_slice().unwrap(), 5.0, 16)
                 .unwrap();
+        let edge_relpos = ndarray::Array2::from_shape_vec(
+            (edge_relpos_vec.len(), 3),
+            edge_relpos_vec.into_iter().flatten().collect(),
+        )
+        .unwrap();
         group.bench_with_input(BenchmarkId::from_parameter(size), &size, |b, &_s| {
             b.iter(|| {
                 let result = model.run_batched(
